@@ -1,14 +1,14 @@
 package ru.javarush.cryptoanalizer.dialog;
 
 
-public class RuDialog {
+public class RuMessage {
 
-    public static void greetingMessage(){
+    static void greetingMessage() {
         System.out.println("Добро пожаловать");
         System.out.println();
     }
 
-    public static void choiceActionMessage(){
+    public static void choiceActionMessage() {
         System.out.println("Выберите действие:");
         System.out.println();
         System.out.println("Нажмите 1 для шифрования текстового файла");
@@ -18,17 +18,34 @@ public class RuDialog {
         System.out.println("Нажмите 5 чтобы выйти из приложения");
     }
 
-    public static void pathMessage(){
+    public static void WhereFromFileMessage() {
         System.out.println("Введите путь к текстовому файлу:");
     }
 
-    public static void keyMessage(){
-        System.out.println("Введите ключ (число на которое сдвинуть символы):");
-    }
-    public static void pathInvalid(){
-        System.out.println("Не корректно введен путь к файлу, попробуйтек снвоа:");
+
+    public static void whereFileMessage() {
+        System.out.println("Введите путь для сохранения файла");
     }
 
+    public static void pathInvalidMessage() {
+        System.out.println("Не корректно введен путь к файлу, попробуйте снова:");
+    }
+
+    public static void FileNotFoundMessage() {
+        System.out.println("Файл не найден");
+    }
+
+    public static void keyMessage() {
+        System.out.println("Введите ключ (число на которое сдвинуть символы):");
+    }
+
+    public static void startCipherMeassage() {
+        System.out.println("Начало зашифровки");
+    }
+
+    public static void endCipherMessage() {
+        System.out.println("Шифврока завеошилась");
+    }
 
 }
 
