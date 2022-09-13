@@ -2,9 +2,10 @@ package ru.javarush.cryptoanalizer.utils;
 
 import ru.javarush.cryptoanalizer.dialog.RuMessage;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,46 +15,13 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CaesarsCipher {
-    private static final List<Character> RU_ALPHABET = Arrays.asList('а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н',
-            'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я',
-            'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н',
-            'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', '(', '.', ',', '"', ':', '-', '!', '&', ')');
-
+    private static final List<Character> RU_ALPHABET = Arrays.asList('а', 'б', 'в', 'г', 'д', 'е',
+            'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц',
+            'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З',
+            'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ',
+            'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', '(', '.', ',', '"', ':', '-', '!', '&', ')');
     private Path src;
 
-    public List<Character> readFile() {
-        List<Character> originalText = new ArrayList<>();
-        File filePath;
-
-        RuMessage.WhereFromFileMessage();
-
-        while (true) {
-            Scanner console = new Scanner(System.in);
-            src = Path.of(console.nextLine());
-            filePath = src.toFile();
-            if (filePath.exists()) {
-                break;
-            } else {
-                RuMessage.pathInvalidMessage();
-            }
-        }
-
-
-        try (Reader readFile = new FileReader(filePath, StandardCharsets.UTF_8);
-             BufferedReader bufferedReader = new BufferedReader(readFile)) {
-
-            while (bufferedReader.ready()) {
-                StringBuilder builder = new StringBuilder(bufferedReader.readLine());
-                for (char c : builder.substring(0).toCharArray()) {
-                    originalText.add(c);
-                }
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return originalText;
-    }
 
     public List<Character> cipher(List<Character> origin) {
         List<Character> cipherChar = new ArrayList<>();
@@ -89,8 +57,29 @@ public class CaesarsCipher {
             }
         }
         return deCipherChar;
-
     }
+
+    public void bruteForce(List<Character> cipherText) {
+        for (int key = 0; key <= RU_ALPHABET.size(); key++) {
+            StringBuilder builder = new StringBuilder();
+            int shift = keyCalculation(key);
+            for (char c : cipherText) {
+                if (RU_ALPHABET.contains(c)) {
+                    c = (RU_ALPHABET.get(offsetCalculationCipher(RU_ALPHABET.indexOf(c) - shift)));
+                    builder.append(c);
+                } else {
+                    builder.append(c);
+                }
+            }
+            if (!(builder.indexOf(". ") == -1) || !(builder.indexOf(", ") == -1) && !((builder.lastIndexOf(".")) == -1)) {
+                System.out.println("Возможное совпадение: " + "ключ: " + "" + shift + " " + builder.substring(0, 50) + "....");
+                System.out.println("===========================");
+            }
+        }
+
+        writeFile(deCipher(cipherText));
+    }
+
 
     private int keyCalculation(int key) {
         if (key > RU_ALPHABET.size()) {
@@ -110,65 +99,79 @@ public class CaesarsCipher {
         return shift;
     }
 
+    public List<Character> readFile() {
+        List<Character> originalText = new ArrayList<>();
+        File filePath;
+
+        RuMessage.WhereFromFileMessage();
+
+        while (true) {
+            Scanner console = new Scanner(System.in);
+            src = Path.of(console.nextLine());
+            filePath = src.toFile();
+            if (filePath.exists()) {
+                break;
+            } else {
+                RuMessage.pathInvalidMessage();
+            }
+        }
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath, StandardCharsets.UTF_8))) {
+
+            while (bufferedReader.ready()) {
+                originalText.add((char) bufferedReader.read());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return originalText;
+    }
+
     public void writeFile(List<Character> fileToWrite) {
-        Scanner console = new Scanner(System.in);
         StringBuilder text = new StringBuilder();
 
         for (char c : fileToWrite) {
             text.append(c);
         }
-        String s = text.toString();
 
         int count = searchDigit(src.toString());
-
-
         try {
             while (Files.exists(src)) {
                 src = Path.of(getNewFileName(src.toString(), count));
                 count++;
             }
             Files.createFile(src);
+            Files.write(src, text.toString().getBytes());
 
-        } catch (
-                IOException e) {
+            System.out.println("Файл создан: " + src.toString());
+        } catch (IOException e) {
             throw new RuntimeException();
         }
-
-        try (
-                RandomAccessFile aFile = new RandomAccessFile(src.toFile(), "rw");
-                FileChannel out = aFile.getChannel()) {
-            ByteBuffer buffer = ByteBuffer.allocate(s.getBytes().length);
-            buffer.put(s.getBytes());
-            buffer.flip();
-            out.write(buffer);
-        } catch (
-                FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (
-                IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     private static String getNewFileName(String oldFileName, int number) {
-        String str = String.valueOf(number);
         int x = oldFileName.lastIndexOf("\\");
         int dotIndex = oldFileName.lastIndexOf(".");
-        String str1 = oldFileName.substring(x, dotIndex).replaceAll("\\d", str);
-        return oldFileName.substring(0, x) + str1 + oldFileName.substring(dotIndex);
+        if (number == 0) {
+            number += 1;
+            return oldFileName.substring(0, dotIndex) + number + oldFileName.substring(dotIndex);
+        } else {
+            String str1 = oldFileName.substring(x, dotIndex).replaceAll("[0-9]+", String.valueOf(number));
+            return oldFileName.substring(0, x) + str1 + oldFileName.substring(dotIndex);
 
+        }
     }
 
     private int searchDigit(String src) {
+        StringBuilder digit = new StringBuilder();
         int result = 0;
         char[] ch = src.toCharArray();
         for (int i = 0; i < ch.length; i++) {
             if (Character.isDigit(ch[i])) {
-                result = Character.getNumericValue(ch[i]) + 1;
+                digit.append(ch[i]);
+                result = Integer.parseInt(String.valueOf(digit));
             }
         }
         return result;
     }
 }
-

@@ -14,8 +14,8 @@ public class RuMessage {
         System.out.println("Нажмите 1 для шифрования текстового файла");
         System.out.println("Нажмите 2 для расшифрки текстового файла");
         System.out.println("Нажмите 3 для взлома зашифрованного файла без ключ");
-        System.out.println("Нажмите 4 чтобы вернуться в предыдущее меню");
-        System.out.println("Нажмите 5 чтобы выйти из приложения");
+      //  System.out.println("Нажмите 4 чтобы вернуться в предыдущее меню");
+        System.out.println("Нажмите 4 чтобы выйти из приложения");
     }
 
     public static void WhereFromFileMessage() {
