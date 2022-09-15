@@ -29,7 +29,7 @@ public class Runner {
                                 switch (engConsole.nextInt()) {
                                     case 1: {
                                         try {
-                                            List<Character> cipherFile = new ArrayList<>();
+                                            List<Character> cipherFile = engCipher.encrypt(engCipher.readFile());
                                             engCipher.writeFile(cipherFile);
                                         }catch (RuntimeException ignored){}
                                     }
