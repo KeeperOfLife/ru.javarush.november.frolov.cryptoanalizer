@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class EngCrypt extends RuСrypt {
+public class EngCrypt extends RuCrypt {
     @Override
     public void choiceActionMessage() {
         System.out.println("Select an action:");
@@ -62,7 +62,7 @@ public class EngCrypt extends RuСrypt {
             if (console.hasNextInt()) {
                 key = console.nextInt();
                 break;
-            } else if (console.equals("EXIT")) {
+            } else if (console.toString().equals("EXIT")) {
                 break;
             } else {
                 System.err.println("The key is entered incorrectly, try again");

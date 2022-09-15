@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Runner {
-
-
-    public static void run() {
+    public Runner() {
         System.out.println("Select a language");
         System.out.println(CaesarsCipher.LINE);
         System.out.println("Press 1: English");
@@ -31,21 +29,21 @@ public class Runner {
                                 switch (engConsole.nextInt()) {
                                     case 1: {
                                         try {
-                                        List<Character> cipherFile = new ArrayList<>();
-                                        engCipher.writeFile(cipherFile);
+                                            List<Character> cipherFile = new ArrayList<>();
+                                            engCipher.writeFile(cipherFile);
                                         }catch (RuntimeException ignored){}
                                     }
                                     break;
                                     case 2: {
                                         try {
-                                        List<Character> deCipherFie = engCipher.decrypt(engCipher.readFile());
-                                        engCipher.writeFile(deCipherFie);
+                                            List<Character> deCipherFie = engCipher.decrypt(engCipher.readFile());
+                                            engCipher.writeFile(deCipherFie);
                                         }catch (RuntimeException ignored){}
                                     }
                                     break;
                                     case 3: {
                                         try {
-                                        engCipher.bruteForce(engCipher.readFile());
+                                            engCipher.bruteForce(engCipher.readFile());
                                         }catch (RuntimeException ignored){}
                                     }
                                     break;
@@ -67,21 +65,21 @@ public class Runner {
                         System.out.println("Русский");
                         while (isExit) {
                             try {
-                                CaesarsCipher ruCipher = new RuСrypt();
+                                CaesarsCipher ruCipher = new RuCrypt();
                                 ruCipher.choiceActionMessage();
                                 Scanner ruConsole = new Scanner(System.in);
                                 switch (ruConsole.nextInt()) {
                                     case 1: {
                                         try {
-                                        List<Character> cipherFile = ruCipher.encrypt(ruCipher.readFile());
-                                        ruCipher.writeFile(cipherFile);
+                                            List<Character> cipherFile = ruCipher.encrypt(ruCipher.readFile());
+                                            ruCipher.writeFile(cipherFile);
                                         }catch (RuntimeException ignored){}
                                     }
                                     break;
                                     case 2: {
                                         try {
-                                        List<Character> deCipherFie = ruCipher.decrypt(ruCipher.readFile());
-                                        ruCipher.writeFile(deCipherFie);
+                                            List<Character> deCipherFie = ruCipher.decrypt(ruCipher.readFile());
+                                            ruCipher.writeFile(deCipherFie);
                                         }catch (RuntimeException ignored){}
                                     }
                                     break;

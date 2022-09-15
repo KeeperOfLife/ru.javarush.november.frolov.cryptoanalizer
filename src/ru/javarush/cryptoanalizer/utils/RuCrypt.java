@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class RuСrypt implements CaesarsCipher {
+public class RuCrypt implements CaesarsCipher {
 
     Path src;
 
@@ -76,7 +76,8 @@ public class RuСrypt implements CaesarsCipher {
             if (console.hasNextInt()) {
                 key = console.nextInt();
                 break;
-            } else if (console.equals("EXIT")) {
+            } else if (console.toString().equals("EXIT")) {
+                System.out.println("Возврат");
                 break;
             } else {
                 System.err.println("Некорректно введен ключ, попробуйте снова");
