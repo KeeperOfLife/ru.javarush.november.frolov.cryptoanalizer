@@ -1,6 +1,6 @@
 package ru.javarush.cryptoanalizer.utils;
 
-import ru.javarush.cryptoanalizer.dialog.RuMessage;
+import ru.javarush.cryptoanalizer.exo.CaesarsCipher;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,20 +14,44 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class CaesarsCipher {
-    private static final List<Character> RU_ALPHABET = Arrays.asList('а', 'б', 'в', 'г', 'д', 'е',
+public class RuСrypt implements CaesarsCipher {
+
+    Path src;
+
+    final List<Character> RU_ALPHABET = Arrays.asList('а', 'б', 'в', 'г', 'д', 'е',
             'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц',
             'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З',
             'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ',
             'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', '(', '.', ',', '"', ':', '-', '!', '&', ')');
-    private Path src;
 
 
-    public List<Character> cipher(List<Character> origin) {
+    @Override
+    public void choiceActionMessage() {
+        System.out.println("Выберите действие:");
+        System.out.println();
+        System.out.println("Нажмите 1 для шифрования текстового файла");
+        System.out.println("Нажмите 2 для расшифровки текстового файла");
+        System.out.println("Нажмите 3 для взлома зашифрованного файла без ключа");
+        System.out.println("Нажмите 4 чтобы выйти из приложения");
+    }
+
+    public List<Character> encrypt(List<Character> origin) {
         List<Character> cipherChar = new ArrayList<>();
+        int key = 0;
 
-        RuMessage.keyMessage();
-        int key = new Scanner(System.in).nextInt();
+
+        System.out.println("Введите ключ (число на которое сдвинуть символы):");
+
+        while (true) {
+            Scanner console = new Scanner(System.in);
+            if (console.hasNextInt()) {
+                key = console.nextInt();
+                break;
+            } else {
+                System.err.println("Некорректно введен ключ, попробуйте снова");
+            }
+        }
+
         int shift = keyCalculation(key);
 
         for (char c : origin) {
@@ -37,15 +61,28 @@ public class CaesarsCipher {
             } else {
                 cipherChar.add(c);
             }
+
         }
         return cipherChar;
     }
 
-    public List<Character> deCipher(List<Character> cipherText) {
+    public List<Character> decrypt(List<Character> cipherText) {
         List<Character> deCipherChar = new ArrayList<>();
+        int key = 0;
 
-        RuMessage.keyMessage();
-        int key = new Scanner(System.in).nextInt();
+        System.out.println("Введите ключ для расшифровки файла или введите \"EXIT\" для возврата в предыдущее меню");
+        while (true) {
+            Scanner console = new Scanner(System.in);
+            if (console.hasNextInt()) {
+                key = console.nextInt();
+                break;
+            } else if (console.equals("EXIT")) {
+                break;
+            } else {
+                System.err.println("Некорректно введен ключ, попробуйте снова");
+            }
+        }
+
         int shift = keyCalculation(key);
 
         for (char c : cipherText) {
@@ -60,7 +97,7 @@ public class CaesarsCipher {
     }
 
     public void bruteForce(List<Character> cipherText) {
-        for (int key = 0; key <= RU_ALPHABET.size(); key++) {
+        for (int key = 1; key <= RU_ALPHABET.size(); key++) {
             StringBuilder builder = new StringBuilder();
             int shift = keyCalculation(key);
             for (char c : cipherText) {
@@ -71,17 +108,18 @@ public class CaesarsCipher {
                     builder.append(c);
                 }
             }
-            if (!(builder.indexOf(". ") == -1) || !(builder.indexOf(", ") == -1) && !((builder.lastIndexOf(".")) == -1)) {
-                System.out.println("Возможное совпадение: " + "ключ: " + "" + shift + " " + builder.substring(0, 50) + "....");
-                System.out.println("===========================");
+
+            if (builder.toString().contains(" в ") && builder.toString().contains(" и ") && builder.lastIndexOf(".") != -1) {
+                System.out.println("Возможное совпадение: " + "ключ: " + "" + shift + " " + builder.substring(0, 50) + ".....");
+                System.out.println(LINE);
             }
         }
 
-        writeFile(deCipher(cipherText));
+        writeFile(decrypt(cipherText));
     }
 
 
-    private int keyCalculation(int key) {
+    public int keyCalculation(int key) {
         if (key > RU_ALPHABET.size()) {
             return key %= RU_ALPHABET.size();
         } else {
@@ -89,7 +127,7 @@ public class CaesarsCipher {
         }
     }
 
-    private int offsetCalculationCipher(int index) {
+    public int offsetCalculationCipher(int index) {
         int shift = index;
         if (index >= RU_ALPHABET.size()) {
             shift = index - RU_ALPHABET.size();
@@ -103,16 +141,18 @@ public class CaesarsCipher {
         List<Character> originalText = new ArrayList<>();
         File filePath;
 
-        RuMessage.WhereFromFileMessage();
+        System.out.println("Введите путь к текстовому файлу или введите \"EXIT\" для возврата в предыдущее меню:");
 
         while (true) {
             Scanner console = new Scanner(System.in);
-            src = Path.of(console.nextLine());
+            src = Path.of(console.nextLine().trim());
             filePath = src.toFile();
             if (filePath.exists()) {
                 break;
+            } else if (src.toString().equals("EXIT")) {
+                break;
             } else {
-                RuMessage.pathInvalidMessage();
+                System.err.println("Не корректно введен путь к файлу или такого файла не существует, попробуйте снова:");
             }
         }
 
@@ -124,6 +164,7 @@ public class CaesarsCipher {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         return originalText;
     }
 
@@ -144,12 +185,13 @@ public class CaesarsCipher {
             Files.write(src, text.toString().getBytes());
 
             System.out.println("Файл создан: " + src.toString());
+            System.out.println(LINE);
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
-    private static String getNewFileName(String oldFileName, int number) {
+    String getNewFileName(String oldFileName, int number) {
         int x = oldFileName.lastIndexOf("\\");
         int dotIndex = oldFileName.lastIndexOf(".");
         if (number == 0) {
@@ -162,13 +204,13 @@ public class CaesarsCipher {
         }
     }
 
-    private int searchDigit(String src) {
+    int searchDigit(String src) {
         StringBuilder digit = new StringBuilder();
         int result = 0;
         char[] ch = src.toCharArray();
-        for (int i = 0; i < ch.length; i++) {
-            if (Character.isDigit(ch[i])) {
-                digit.append(ch[i]);
+        for (char c : ch) {
+            if (Character.isDigit(c)) {
+                digit.append(c);
                 result = Integer.parseInt(String.valueOf(digit));
             }
         }
