@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Start {
+public class Collector {
     private CaesarsCipher cipher = new Cipher();
     private List<Character> text = new ArrayList<>();
     private ReadWriteFile rw = new ReadWriteFile();
